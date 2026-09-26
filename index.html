@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>🦋</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;1,500;1,600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+<style>
+:root{
+  --pink:#ffd6e8; --pink-deep:#ff9ec7; --purple:#c9a8ff; --lav:#efe3ff;
+  --ink:#4a2e55; --card-ink:#3a2540; --bg1:#fff5fa; --bg2:#f3e8ff;
+  --btn:#ff6fa8; --btn-ink:#ffffff;
+  --neon-pink:#ff2fd0; --neon-purple:#9b5cff; --neon-cyan:#00e6c8;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg1:#241a2e; --bg2:#2e1f3d; --ink:#f3e6ff; --card-ink:#f3e6ff; --lav:#3a2a4d;
+  }
+}
+:root[data-theme="dark"]{ --bg1:#241a2e; --bg2:#2e1f3d; --ink:#f3e6ff; --card-ink:#f3e6ff; --lav:#3a2a4d; }
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+*{box-sizing:border-box;}
+html,body{height:100%;margin:0;}
+body{
+  font-family:'Poppins',sans-serif; color:var(--ink);
+  background:linear-gradient(160deg,var(--bg1),var(--bg2));
+  overflow-x:hidden; position:relative; min-height:100%;
+}
+.butterflies{position:fixed; inset:0; pointer-events:none; z-index:5; overflow:hidden;}
+.bfly{position:absolute; bottom:-40px; font-size:22px; animation:flyUp linear infinite; opacity:.85; filter:drop-shadow(0 2px 3px rgba(0,0,0,.1));}
+@keyframes flyUp{
+  0%{transform:translate(0,0) rotate(0deg);}
+  25%{transform:translate(30px,-25vh) rotate(10deg);}
+  50%{transform:translate(-25px,-50vh) rotate(-8deg);}
+  75%{transform:translate(20px,-75vh) rotate(6deg);}
+  100%{transform:translate(0,-110vh) rotate(0deg);}
+}
+.screen{
+  min-height:100vh; width:100%; display:none; flex-direction:column; align-items:center; justify-content:center;
+  padding:32px 20px 48px; text-align:center; position:relative; z-index:2;
+}
+.screen.active{display:flex;}
+h1{font-family:'Playfair Display',serif; font-size:clamp(28px,7vw,44px); margin:0 0 10px; color:var(--ink);}
+p.sub{max-width:420px; line-height:1.6; font-size:15px; opacity:.85; margin:0 0 26px;}
+.btn{
+  background:linear-gradient(135deg,#ff6fa8,#ff2fd0); color:#fff; border:2px solid rgba(255,255,255,.5); padding:16px 34px; border-radius:44px;
+  font-family:'Poppins',sans-serif; font-weight:700; font-size:16px; cursor:pointer; letter-spacing:.3px;
+  box-shadow:0 0 10px var(--neon-pink), 0 0 26px rgba(255,47,208,.55), 0 8px 20px rgba(255,47,208,.3);
+  text-shadow:0 0 8px rgba(255,255,255,.5);
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.btn:hover{transform:translateY(-3px) scale(1.05); box-shadow:0 0 16px var(--neon-pink), 0 0 40px rgba(255,47,208,.7), 0 10px 26px rgba(255,47,208,.4);}
+.btn.ghost{background:transparent; border:2px solid var(--btn); color:var(--btn);}
+/* Quiz */
+.qcard{max-width:440px; width:100%;}
+.progress{display:flex; gap:6px; justify-content:center; margin-bottom:22px;}
+.dot{width:8px; height:8px; border-radius:50%; background:var(--lav);}
+.dot.done{background:var(--btn-ink); background:var(--btn);}
+.qtext{font-size:19px; font-weight:600; margin-bottom:22px; line-height:1.4;}
+.opts{display:flex; flex-direction:column; gap:12px;}
+.opt{
+  background:rgba(255,255,255,.6); border:2px solid transparent; border-radius:16px; padding:15px 17px;
+  font-size:14.5px; cursor:pointer; text-align:left; color:var(--ink); font-family:'Poppins',sans-serif;
+  transform:perspective(700px) rotateX(0) translateY(0) translateZ(0); transform-style:preserve-3d;
+  box-shadow:0 4px 0 rgba(120,60,110,.2), 0 8px 16px rgba(120,60,110,.15);
+  transition:transform .18s cubic-bezier(.2,.8,.3,1.3), box-shadow .18s ease, border-color .18s ease;
+}
+.opt:hover{
+  border-color:var(--neon-purple); transform:perspective(700px) rotateX(6deg) translateY(-4px) translateZ(4px) scale(1.02);
+  box-shadow:0 2px 0 rgba(120,60,110,.2), 0 16px 26px rgba(155,92,255,.3), 0 0 18px rgba(155,92,255,.35);
+}
+.opt:active{transform:perspective(700px) translateY(-1px) scale(.99); box-shadow:0 2px 0 rgba(120,60,110,.2), 0 6px 12px rgba(120,60,110,.2);}
+.opt.selected{background:var(--pink-deep); color:#fff;}
+:root[data-theme="dark"] .opt, @media (prefers-color-scheme:dark){ .opt{background:rgba(255,255,255,.08);} }
+.finalq .opts{position:relative; height:220px; width:100%;}
+.finalq .opt{
+  position:absolute; font-weight:700; font-size:17px; padding:20px 40px; border-radius:60px; letter-spacing:.4px;
+  border:2px solid rgba(255,255,255,.6); text-align:center; color:#fff;
+  transition:top .18s ease, left .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+.finalq .yes{
+  background:linear-gradient(135deg,#33ffc4,#00b8ff); text-shadow:0 0 6px rgba(0,0,0,.15);
+  box-shadow:0 0 14px var(--neon-cyan), 0 0 34px rgba(0,184,255,.55), 0 8px 20px rgba(0,184,255,.3);
+}
+.finalq .no{
+  background:linear-gradient(135deg,#ff5fb3,#ff2fd0); text-shadow:0 0 6px rgba(0,0,0,.15);
+  box-shadow:0 0 14px var(--neon-pink), 0 0 34px rgba(255,47,208,.55), 0 8px 20px rgba(255,47,208,.3);
+}
+.finalq .opt:hover{transform:scale(1.06);}
+/* Result */
+.resultCard{
+  background:rgba(255,255,255,.6); border-radius:24px; padding:32px 26px; max-width:420px; width:100%;
+  box-shadow:0 10px 30px rgba(120,60,110,.15);
+}
+.vibe{font-family:'Playfair Display',serif; font-size:24px; margin:6px 0 4px;}
+.code{font-size:13px; letter-spacing:1px; opacity:.7; margin-bottom:20px;}
+.surprise{
+  margin-top:30px; font-size:13px; opacity:.6; cursor:pointer; animation:pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:.45;}50%{opacity:.9;}}
+/* Shayari overlay - all cards together */
+.overlay{position:fixed; inset:0; z-index:50; display:none; flex-direction:column; align-items:center; padding:70px 20px 40px; overflow-y:auto;}
+.overlay.show{display:flex;}
+.shayCard{
+  width:100%; max-width:420px; min-height:220px; border-radius:26px; padding:34px 26px; margin-bottom:22px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+  color:#fff; box-shadow:0 15px 40px rgba(0,0,0,.25);
+  opacity:0; transform:scale(.7) translateY(30px);
+  animation:popIn .6s cubic-bezier(.2,.9,.3,1.3) forwards;
+}
+@keyframes popIn{
+  0%{opacity:0; transform:scale(.7) translateY(30px);}
+  70%{opacity:1; transform:scale(1.04) translateY(-4px);}
+  100%{opacity:1; transform:scale(1) translateY(0);}
+}
+.shayCard:nth-child(1){animation-delay:.1s;}
+.shayCard:nth-child(2){animation-delay:.5s;}
+.shayCard:nth-child(3){animation-delay:.9s;}
+.shayCard.c1{background:linear-gradient(150deg,#5b2a86,#a24d9e);}
+.shayCard.c2{background:linear-gradient(150deg,#8e2a5e,#e0678e);}
+.shayCard.c3{background:linear-gradient(150deg,#233d6b,#5f7fc4);}
+.shayText{font-family:'Playfair Display',serif; font-style:italic; font-size:19px; line-height:1.9; white-space:pre-line;}
+.shayFooter{margin-top:22px; font-family:'Poppins',sans-serif; font-weight:600; font-size:13px; letter-spacing:.5px; opacity:.9;}
+.closeOverlay{position:fixed; top:18px; right:18px; background:rgba(255,255,255,.2); border:none; color:#fff; font-size:20px; width:38px; height:38px; border-radius:50%; cursor:pointer; z-index:55;}
+.globalMusicBtn{
+  position:fixed; top:16px; right:16px; z-index:60; background:rgba(255,255,255,.25); backdrop-filter:blur(4px);
+  border:2px solid rgba(255,255,255,.5); color:#fff; width:42px; height:42px; border-radius:50%; cursor:pointer; font-size:16px;
+  box-shadow:0 0 10px rgba(155,92,255,.4);
+}
+:root[data-theme="light"] .globalMusicBtn, body .globalMusicBtn{color:var(--ink); background:rgba(255,255,255,.55); border-color:rgba(155,92,255,.4);}
+</style>
+</head>
+<body>
+
+<div class="butterflies" id="bfLayer"></div>
+<button class="globalMusicBtn" id="globalMusicBtn" onclick="toggleGlobalMusic()">🎵</button>
+
+<section class="screen active" id="landing">
+  <h1>Happy Birthday, Asiya 🦋</h1>
+  <p class="sub">A little something made just for your day — a few questions, a bit of fun, and a small surprise waiting at the end.</p>
+  <button class="btn" onclick="startExperience()">Let's begin ✨</button>
+</section>
+
+<section class="screen" id="quiz">
+  <div class="qcard">
+    <div class="progress" id="progress"></div>
+    <div id="qHolder"></div>
+  </div>
+</section>
+
+<section class="screen" id="result">
+  <div class="resultCard">
+    <div style="font-size:34px;">🦋</div>
+    <div class="vibe" id="vibeTitle"></div>
+    <div class="code" id="vibeCode"></div>
+    <p class="sub" style="margin:0 0 18px;">Copy your result and send it over — just to prove you actually played 😄</p>
+    <button class="btn" onclick="copyResult()">Copy my result</button>
+    <div class="surprise" onclick="openShayari()">psst... one more thing, tap here ✨</div>
+  </div>
+</section>
+
+<div class="overlay" id="shayOverlay">
+  <button class="closeOverlay" onclick="closeShayari()">✕</button>
+
+  <div class="shayCard c1">
+    <div class="shayText">Tum salāmat raho hazār baras,
+har baras ke hoñ din pachās hazār.</div>
+    <div class="shayFooter">Wishing you a very happy birthday, Maidam G.</div>
+  </div>
+  <div class="shayCard c2">
+    <div class="shayText">Hasīn chehre kī tābindagī mubārak ho,
+tujhe ye sāl-girah kī ḳhushī mubārak ho.</div>
+    <div class="shayFooter">Wishing you a very happy birthday, Maidam G.</div>
+  </div>
+  <div class="shayCard c3">
+    <div class="shayText">Sālgirah tumhārī aur ḳhushī merī hai,
+tumhārā muskurānā hī merā sukūn hai.</div>
+    <div class="shayFooter">Wishing you a very happy birthday, Maidam G.</div>
+  </div>
+</div>
+
+<script>
+/* Butterflies */
+const bfLayer = document.getElementById('bfLayer');
+for(let i=0;i<16;i++){
+  const b = document.createElement('div');
+  b.className='bfly'; b.textContent='🦋';
+  b.style.left = (Math.random()*94)+'vw';
+  b.style.animationDuration = (9+Math.random()*10)+'s';
+  b.style.animationDelay = (Math.random()*10)+'s';
+  b.style.fontSize = (16+Math.random()*16)+'px';
+  bfLayer.appendChild(b);
+}
+
+/* Audio unlock + hover blips */
+let uiSynth=null;
+function initAudio(){
+  if(!uiSynth){
+    uiSynth = new Tone.Synth({oscillator:{type:'triangle'}, volume:-16, envelope:{attack:0.001,decay:0.12,sustain:0,release:0.1}}).toDestination();
+  }
+}
+function playBlip(note){
+  if(uiSynth){ try{ uiSynth.triggerAttackRelease(note,'32n'); }catch(e){} }
+}
+function startExperience(){
+  try{ Tone.start().then(initAudio); }catch(e){}
+  goTo('quiz');
+}
+
+/* Screens */
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id==='quiz'){ renderQ(); }
+}
+
+/* Quiz data */
+const questions = [
+  {q:"If today had a theme song, it would be...", opts:["Party anthem 🎉","Lazy birthday nap 😴","Emotional Bollywood song 🎬","Dance till you drop 💃"]},
+  {q:"Pick your birthday power-up:", opts:["Unlimited cake 🍰","Time travel to relive today","A closet full of butterflies 🦋","Nap superpower 😌"]},
+  {q:"Your birthday mood today is closest to:", opts:["Main character energy ✨","Chill and cozy","Excited like a kid","Just here for the cake"]},
+  {q:"If a butterfly followed you around all day, you'd name it:", opts:["Flutter","Bella-Boo","Coco","Whiskers"]},
+  {q:"Someone out there thinks you're pretty amazing. Any guesses who?", opts:["A secret admirer 👀","The universe","Butterflies, obviously 🦋","All of the above"]},
+];
+let answers = [];
+let qi = 0;
+
+function renderProgress(){
+  const p = document.getElementById('progress'); p.innerHTML='';
+  const total = questions.length+1;
+  for(let i=0;i<total;i++){
+    const d = document.createElement('div');
+    d.className='dot'+(i<qi?' done':'');
+    p.appendChild(d);
+  }
+}
+
+function renderQ(){
+  renderProgress();
+  const holder = document.getElementById('qHolder');
+  if(qi < questions.length){
+    const item = questions[qi];
+    holder.innerHTML = `<div class="qtext">${item.q}</div><div class="opts" id="opts"></div>`;
+    const opts = document.getElementById('opts');
+    item.opts.forEach((o,idx)=>{
+      const btn = document.createElement('button');
+      btn.className='opt'; btn.textContent=o;
+      btn.onclick = ()=>{ answers.push(idx); qi++; renderQ(); };
+      btn.addEventListener('pointerenter', ()=>playBlip(['C6','D6','E6','G6'][idx%4]));
+      opts.appendChild(btn);
+    });
+  } else {
+    holder.innerHTML = `
+      <div class="qtext">Did today make you smile at least once? 🙂</div>
+      <div class="opts finalq">
+        <button class="opt yes" id="yesBtn" onclick="finishQuiz()">Yes 💗</button>
+        <button class="opt no" id="noBtn">No</button>
+      </div>`;
+    setupRunaway();
+    renderProgress();
+  }
+}
+
+function setupRunaway(){
+  const noBtn = document.getElementById('noBtn');
+  const yesBtn = document.getElementById('yesBtn');
+  const container = noBtn.parentElement;
+  [yesBtn, noBtn].forEach(b=>{
+    b.style.top='50%'; b.style.left='50%'; b.style.transform='translate(-50%,-50%)';
+  });
+  noBtn.style.zIndex='3'; yesBtn.style.zIndex='2';
+  const move = ()=>{
+    const cw = container.clientWidth, ch = container.clientHeight;
+    const bw = noBtn.offsetWidth || 140, bh = noBtn.offsetHeight || 60;
+    const maxX = Math.max(cw-bw,10), maxY = Math.max(ch-bh,10);
+    noBtn.style.transform='none';
+    noBtn.style.left = (Math.random()*maxX)+'px';
+    noBtn.style.top = (Math.random()*maxY)+'px';
+    playBlip('A5');
+  };
+  noBtn.addEventListener('pointerenter', move);
+  noBtn.addEventListener('touchstart', (e)=>{ e.preventDefault(); move(); }, {passive:false});
+  noBtn.addEventListener('click', move);
+}
+
+function finishQuiz(){
+  const vibes = [
+    "Butterfly Main Character ✨","Cake-Powered Royalty 👑🍰",
+    "Chaotic Birthday Energy 🎉","Secretly Loved Superstar 💫","Effortlessly Iconic 🦋"
+  ];
+  const sum = answers.reduce((a,b)=>a+b,3);
+  const vibe = vibes[sum % vibes.length];
+  const code = "BDAY-" + ((sum*37+241) % 900 + 100);
+  document.getElementById('vibeTitle').textContent = vibe;
+  document.getElementById('vibeCode').textContent = "Result code: " + code;
+  window._resultText = `My birthday quiz result: ${vibe} — ${code}`;
+  goTo('result');
+}
+
+function copyResult(){
+  const text = window._resultText || "Birthday quiz result";
+  try{
+    navigator.clipboard.writeText(text);
+    alert("Copied! Paste it wherever you like ✨");
+  }catch(e){
+    prompt("Copy this:", text);
+  }
+}
+
+/* Shayari overlay */
+function openShayari(){
+  document.getElementById('shayOverlay').classList.add('show');
+}
+function closeShayari(){
+  document.getElementById('shayOverlay').classList.remove('show');
+}
+
+/* Background melody — plays continuously across the whole page */
+let musicOn = false; let melodySynth, melodyLoop, musicReady=false;
+function buildMelody(){
+  if(melodySynth) return;
+  melodySynth = new Tone.PolySynth(Tone.Synth, {volume:-15, oscillator:{type:"sine"}}).toDestination();
+  const notes = ["C4","E4","G4","B4","A4","G4","E4","D4"];
+  let idx=0;
+  melodyLoop = new Tone.Loop(time=>{
+    melodySynth.triggerAttackRelease(notes[idx % notes.length], "4n", time);
+    idx++;
+  }, "2n");
+  Tone.Transport.bpm.value = 72;
+  musicReady = true;
+}
+function startMusic(){
+  if(musicOn) return;
+  Tone.start().then(()=>{
+    buildMelody();
+    melodyLoop.start(0); Tone.Transport.start();
+    musicOn = true;
+    document.getElementById('globalMusicBtn').textContent = "🔇";
+  }).catch(()=>{});
+}
+function stopMusic(){
+  if(!musicOn) return;
+  Tone.Transport.stop(); if(melodyLoop) melodyLoop.stop();
+  musicOn = false;
+  document.getElementById('globalMusicBtn').textContent = "🎵";
+}
+function toggleGlobalMusic(){ musicOn ? stopMusic() : startMusic(); }
+
+/* Try to auto-play immediately; if the browser blocks it, start on the very first tap anywhere */
+window.addEventListener('load', ()=>{ startMusic(); });
+document.addEventListener('pointerdown', function firstTouch(){
+  startMusic();
+  document.removeEventListener('pointerdown', firstTouch);
+}, {once:true});
+</script>
+</body>
+</html>
